@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useWatchHistoryData } from './hooks/useWatchHistoryData';
 import type { NormalizedWatchRecord } from '../../types';
+import { DataTable } from '../../components/tables/DataTable';
 import { VirtualTable } from '../../components/tables/VirtualTable';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { Select } from '../../components/ui/Select';
@@ -10,7 +11,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ErrorFallback } from '../../components/ui/ErrorFallback';
 import { formatDateTime } from '../../lib/format/dates';
-import { ExternalLink, History } from 'lucide-react';
+import { ExternalLink, History, ListFilter, Layers } from 'lucide-react';
 
 export function HistoryPage() {
   const { data: history = [], isLoading, isError, refetch } = useWatchHistoryData();
@@ -20,6 +21,7 @@ export function HistoryPage() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [viewMode, setViewMode] = useState<'paginated' | 'virtual'>('paginated');
 
   // Filtered records
   const filteredData = useMemo(() => {
@@ -60,7 +62,7 @@ export function HistoryPage() {
         header: 'Date & Time',
         size: 190,
         cell: (info) => (
-          <span className="text-xs text-slate-500 font-mono">
+          <span className="text-xs text-slate-500 font-mono whitespace-nowrap">
             {formatDateTime(info.getValue<string>())}
           </span>
         ),
@@ -68,32 +70,42 @@ export function HistoryPage() {
       {
         accessorKey: 'title',
         header: 'Title & Channel',
+        meta: { flex: '3 1 0%' },
         cell: (info) => {
           const item = info.row.original;
           return (
-            <div className="flex flex-col min-w-0 pr-4">
-              <span
-                className="font-medium text-slate-900 dark:text-slate-100 truncate text-sm"
-                title={item.title}
-              >
-                {item.title}
-              </span>
-              <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                <span className="truncate max-w-[200px]" title={item.channelName}>
+            <div className="flex flex-col min-w-0">
+              {item.titleUrl ? (
+                <a
+                  href={item.titleUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-slate-900 dark:text-white hover:text-red-600 dark:hover:text-red-400 transition-colors flex items-center gap-1 truncate text-sm"
+                  title={item.title}
+                >
+                  <span className="truncate">{item.title}</span>
+                  <ExternalLink className="w-3 h-3 text-slate-400 shrink-0" />
+                </a>
+              ) : (
+                <span className="font-medium text-slate-900 dark:text-slate-100 truncate text-sm" title={item.title}>
+                  {item.title}
+                </span>
+              )}
+              {item.channelUrl ? (
+                <a
+                  href={item.channelUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors truncate mt-0.5 max-w-[260px]"
+                  title={item.channelName}
+                >
+                  {item.channelName || 'Unknown Channel'}
+                </a>
+              ) : (
+                <span className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5 max-w-[260px]">
                   {item.channelName || 'Unknown Channel'}
                 </span>
-                {item.titleUrl && (
-                  <a
-                    href={item.titleUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors shrink-0"
-                    title="Open on YouTube"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                )}
-              </div>
+              )}
             </div>
           );
         },
@@ -101,20 +113,16 @@ export function HistoryPage() {
       {
         accessorKey: 'isMusic',
         header: 'Product',
-        size: 130,
+        size: 120,
         cell: (info) => {
           const isMusic = info.getValue<boolean>();
-          return (
-            <Badge variant={isMusic ? 'blue' : 'slate'}>
-              {isMusic ? 'YT Music' : 'YouTube'}
-            </Badge>
-          );
+          return <Badge variant={isMusic ? 'blue' : 'slate'}>{isMusic ? 'YT Music' : 'YouTube'}</Badge>;
         },
       },
       {
         accessorKey: 'type',
         header: 'Action',
-        size: 120,
+        size: 110,
         cell: (info) => {
           const type = info.getValue<string>();
           let variant: 'slate' | 'amber' | 'purple' = 'slate';
@@ -206,11 +214,54 @@ export function HistoryPage() {
             onStartDateChange={setStartDate}
             onEndDateChange={setEndDate}
           />
+
+          {/* Pages / Virtual toggle — matching Music Library */}
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700/60 flex-shrink-0">
+            <button
+              onClick={() => setViewMode('paginated')}
+              type="button"
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                viewMode === 'paginated'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Paginated Table View"
+            >
+              <ListFilter className="w-3.5 h-3.5" />
+              <span>Pages</span>
+            </button>
+            <button
+              onClick={() => setViewMode('virtual')}
+              type="button"
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                viewMode === 'virtual'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                  : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Virtualized Scroll View"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Virtual</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Virtualized Table */}
-      <VirtualTable data={filteredData} columns={columns} />
+      {/* Table — paginated by default, matching Music Library's grid spacing */}
+      <div className="space-y-1">
+        <p className="text-xs text-slate-500 dark:text-slate-400 px-0.5">
+          Showing{' '}
+          <strong className="tabular-nums text-slate-800 dark:text-slate-200">
+            {filteredData.length.toLocaleString()}
+          </strong>{' '}
+          records{viewMode === 'virtual' ? ' (virtualized)' : ''}
+        </p>
+        {viewMode === 'paginated' ? (
+          <DataTable data={filteredData} columns={columns} pageSize={10} />
+        ) : (
+          <VirtualTable data={filteredData} columns={columns} estimateRowHeight={60} />
+        )}
+      </div>
     </div>
   );
 }
