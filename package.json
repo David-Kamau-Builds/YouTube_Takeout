@@ -7,12 +7,14 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "extract-takeout": "node scripts/extract-takeout.js"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.102.8",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.14.12",
+    "fflate": "^0.8.3",
     "lucide-react": "^1.45.0",
     "papaparse": "^5.7.0",
     "react": "^19.2.8",

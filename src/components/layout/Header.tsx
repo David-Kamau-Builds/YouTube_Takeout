@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { DatasetStatusBadge } from '../takeout/DatasetStatusBadge';
 
 const ROUTE_NAMES: Record<string, string> = {
   '/': 'Dashboard',
@@ -37,7 +38,8 @@ export function Header({ onOpenMobileSidebar }: HeaderProps) {
           {title}
         </h1>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
+        <DatasetStatusBadge />
         <ThemeToggle />
       </div>
     </header>

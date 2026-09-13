@@ -1,9 +1,9 @@
-import { fetchJson } from '../data/fetchJson';
+import { fileLoader } from '../takeout/fileLoader';
 import type { WatchHistoryRecord, NormalizedWatchRecord } from '../../types';
 import { cleanTitle, cleanArtistName, extractVideoId, getActionType } from '../format/strings';
 
 export async function loadWatchHistory(): Promise<NormalizedWatchRecord[]> {
-  const rawRecords = await fetchJson<WatchHistoryRecord[]>('/data/history/watch-history.json');
+  const rawRecords = await fileLoader.readJson<WatchHistoryRecord[]>('history/watch-history.json');
 
   return rawRecords.map((record, index) => {
     const isMusic = record.header === 'YouTube Music';

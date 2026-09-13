@@ -1,4 +1,5 @@
-import { fetchCsv } from '../data/fetchCsv';
+import { fileLoader } from '../takeout/fileLoader';
+import { parseCsvText } from '../data/fetchCsv';
 import type { MusicLibrarySong } from '../../types';
 
 interface RawMusicLibrarySong {
@@ -11,7 +12,8 @@ interface RawMusicLibrarySong {
 }
 
 export async function loadMusicLibrary(): Promise<MusicLibrarySong[]> {
-  const raw = await fetchCsv<RawMusicLibrarySong>('/data/music/music library songs.csv');
+  const text = await fileLoader.readText('music/music library songs.csv');
+  const raw = await parseCsvText<RawMusicLibrarySong>(text);
 
   return raw
     .filter(row => row && row['Video ID'])

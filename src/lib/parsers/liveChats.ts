@@ -1,4 +1,5 @@
-import { fetchCsv } from '../data/fetchCsv';
+import { fileLoader } from '../takeout/fileLoader';
+import { parseCsvText } from '../data/fetchCsv';
 import type { LiveChat, CommentTextSegment } from '../../types';
 
 interface RawLiveChat {
@@ -59,7 +60,8 @@ function parseTextSegments(rawText?: string): { segments: CommentTextSegment[]; 
 }
 
 export async function loadLiveChats(): Promise<LiveChat[]> {
-  const raw = await fetchCsv<RawLiveChat>('/data/live-chats/live chats.csv');
+  const text = await fileLoader.readText('live-chats/live chats.csv');
+  const raw = await parseCsvText<RawLiveChat>(text);
 
   return raw
     .filter(row => row && row['Live Chat ID'])
