@@ -58,7 +58,7 @@ export function HistoryPage() {
       {
         accessorKey: 'time',
         header: 'Date & Time',
-        size: 160,
+        size: 195,
         cell: (info) => (
           <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
             {formatDateTime(info.getValue<string>())}
@@ -68,11 +68,11 @@ export function HistoryPage() {
       {
         accessorKey: 'title',
         header: 'Title',
-        size: 400,
+        meta: { flex: '3 1 0%' },
         cell: (info) => {
           const record = info.row.original;
           return (
-            <div className="flex items-center gap-1.5 max-w-lg">
+            <div className="flex items-center gap-1.5 w-full min-w-0">
               {record.titleUrl ? (
                 <a
                   href={record.titleUrl}
@@ -95,7 +95,7 @@ export function HistoryPage() {
       {
         accessorKey: 'channelName',
         header: 'Channel / Artist',
-        size: 200,
+        meta: { flex: '2 1 0%' },
         cell: (info) => {
           const record = info.row.original;
           return record.channelUrl ? (

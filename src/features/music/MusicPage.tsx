@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMusicPageData } from './hooks/useMusicPageData';
 import type { MusicLibrarySong, NormalizedWatchRecord } from '../../types';
@@ -6,13 +6,16 @@ import { KpiCard } from '../../components/ui/KpiCard';
 import { TopBarChart } from '../../components/charts/BarChart';
 import { DataTable } from '../../components/tables/DataTable';
 import { VirtualTable } from '../../components/tables/VirtualTable';
+import { SearchInput } from '../../components/ui/SearchInput';
 import { KpiCardSkeleton, ChartSkeleton } from '../../components/ui/Skeleton';
 import { ErrorFallback } from '../../components/ui/ErrorFallback';
 import { formatDateTime } from '../../lib/format/dates';
-import { Music, Mic, Disc, Library, ExternalLink } from 'lucide-react';
+import { Music, Mic, Disc, Library, ExternalLink, ListFilter, Layers } from 'lucide-react';
 
 export function MusicPage() {
   const { data, isLoading, isError, refetch } = useMusicPageData();
+  const [historySearch, setHistorySearch] = useState('');
+  const [viewMode, setViewMode] = useState<'paginated' | 'virtual'>('paginated');
 
   const libraryColumns = useMemo<ColumnDef<MusicLibrarySong, any>[]>(
     () => [
@@ -70,7 +73,7 @@ export function MusicPage() {
       {
         accessorKey: 'time',
         header: 'Played At',
-        size: 170,
+        size: 195,
         cell: (info) => (
           <span className="text-xs text-slate-500 font-mono">
             {formatDateTime(info.getValue<string>())}
@@ -80,7 +83,7 @@ export function MusicPage() {
       {
         accessorKey: 'title',
         header: 'Track Title',
-        size: 380,
+        meta: { flex: '3 1 0%' },
         cell: (info) => {
           const record = info.row.original;
           return record.titleUrl ? (
@@ -103,7 +106,7 @@ export function MusicPage() {
       {
         accessorKey: 'channelName',
         header: 'Artist',
-        size: 220,
+        meta: { flex: '2 1 0%' },
         cell: (info) => (
           <span className="text-slate-700 dark:text-slate-300 truncate block">
             {info.getValue<string>()}
@@ -113,6 +116,17 @@ export function MusicPage() {
     ],
     []
   );
+
+  const filteredHistory = useMemo(() => {
+    if (!data?.musicHistory) return [];
+    if (!historySearch.trim()) return data.musicHistory;
+    const q = historySearch.toLowerCase();
+    return data.musicHistory.filter(
+      (item) =>
+        item.title.toLowerCase().includes(q) ||
+        item.channelName.toLowerCase().includes(q)
+    );
+  }, [data?.musicHistory, historySearch]);
 
   if (isLoading) {
     return (
@@ -134,7 +148,7 @@ export function MusicPage() {
     return <ErrorFallback onRetry={() => refetch()} />;
   }
 
-  const { musicHistory, library, topArtists, topSongs, totalPlays, uniqueArtistsCount, uniqueSongsCount } = data;
+  const { library, topArtists, topSongs, totalPlays, uniqueArtistsCount, uniqueSongsCount } = data;
 
   return (
     <div className="space-y-8">
@@ -190,11 +204,63 @@ export function MusicPage() {
       </div>
 
       {/* Full Music Listening History */}
-      <div className="space-y-3">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
-          Listening History Log ({musicHistory.length} plays)
-        </h3>
-        <VirtualTable data={musicHistory} columns={historyColumns} />
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+              Listening History Log ({filteredHistory.length} plays)
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Search and explore your complete music streaming history.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="w-full sm:w-64">
+              <SearchInput
+                value={historySearch}
+                onChange={setHistorySearch}
+                placeholder="Search track or artist..."
+              />
+            </div>
+
+            {/* View Mode Toggle */}
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700/60 flex-shrink-0">
+              <button
+                onClick={() => setViewMode('paginated')}
+                type="button"
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                  viewMode === 'paginated'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+                title="Paginated Table View"
+              >
+                <ListFilter className="w-3.5 h-3.5" />
+                <span>Pages</span>
+              </button>
+              <button
+                onClick={() => setViewMode('virtual')}
+                type="button"
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                  viewMode === 'virtual'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+                title="Virtualized Scroll View"
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>Virtual</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {viewMode === 'paginated' ? (
+          <DataTable data={filteredHistory} columns={historyColumns} pageSize={10} />
+        ) : (
+          <VirtualTable data={filteredHistory} columns={historyColumns} />
+        )}
       </div>
     </div>
   );

@@ -30,9 +30,9 @@ export function KpiCard({
   const formattedValue = compact ? formatCompact(value) : formatNumber(value);
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all duration-200">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-lg hover:-translate-y-0.5 dark:hover:border-slate-700/80 transition-all duration-200">
       <div className="flex items-center justify-between gap-3 mb-3">
-        <span className="text-sm font-medium text-slate-500 dark:text-slate-400 tracking-wide">
+        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
           {title}
         </span>
         <div className={`p-2.5 rounded-xl border ${COLOR_MAP[color]}`}>
@@ -40,7 +40,7 @@ export function KpiCard({
         </div>
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        <span className="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
           {formattedValue}
         </span>
         {subValue && (

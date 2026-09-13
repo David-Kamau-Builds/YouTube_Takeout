@@ -56,6 +56,7 @@ export interface CommentTextSegment {
   emoji?: {
     customEmojiUrl?: string;
   };
+  customEmojiUrl?: string;
 }
 
 export interface Comment {
@@ -71,6 +72,7 @@ export interface Comment {
   plainText: string;
   topLevelCommentId?: string;
   isReply: boolean;
+  hasCustomEmoji: boolean;
 }
 
 export interface LiveChat {

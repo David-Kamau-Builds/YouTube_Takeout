@@ -9,7 +9,9 @@ import { Badge } from '../../components/ui/Badge';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ErrorFallback } from '../../components/ui/ErrorFallback';
 import { formatDateTime } from '../../lib/format/dates';
-import { MessageSquare, ExternalLink, CornerDownRight } from 'lucide-react';
+import { MessageSquare, CornerDownRight } from 'lucide-react';
+import { FormattedMessageText } from '../../components/ui/FormattedMessageText';
+import { VideoPreviewCell } from '../../components/ui/VideoPreviewCell';
 
 export function CommentsPage() {
   const { data: comments = [], isLoading, isError, refetch } = useQuery({
@@ -53,9 +55,10 @@ export function CommentsPage() {
                   <span>Reply to comment</span>
                 </div>
               )}
-              <p className="text-sm text-slate-900 dark:text-white whitespace-pre-wrap">
-                {comment.plainText || '(No text content)'}
-              </p>
+              <FormattedMessageText
+                segments={comment.textSegments}
+                fallbackText={comment.plainText}
+              />
             </div>
           );
         },
@@ -65,20 +68,7 @@ export function CommentsPage() {
         header: 'Video Link',
         cell: (info) => {
           const videoId = info.getValue<string | undefined>();
-          if (!videoId) {
-            return <Badge variant="slate">Community Post</Badge>;
-          }
-          return (
-            <a
-              href={`https://www.youtube.com/watch?v=${videoId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-red-600 hover:text-red-700 dark:text-red-400 font-medium text-xs flex items-center gap-1"
-            >
-              <span>Watch Video</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          );
+          return <VideoPreviewCell videoId={videoId} fallbackLabel="Community Post" />;
         },
       },
       {

@@ -6,7 +6,9 @@ import { Badge } from '../../components/ui/Badge';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ErrorFallback } from '../../components/ui/ErrorFallback';
 import { formatDate } from '../../lib/format/dates';
-import { ListVideo, ChevronDown, ChevronUp, ExternalLink, Calendar, Film } from 'lucide-react';
+import { getYouTubeThumbnailUrl } from '../../lib/utils/youtube';
+import { VideoPreviewCell } from '../../components/ui/VideoPreviewCell';
+import { ListVideo, ChevronDown, ChevronUp, Calendar, Film } from 'lucide-react';
 
 export function PlaylistsPage() {
   const { data: playlists = [], isLoading, isError, refetch } = useQuery({
@@ -52,7 +54,10 @@ export function PlaylistsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {playlists.map((playlist: Playlist) => {
           const isExpanded = expandedId === playlist.playlistId;
-          const thumbnail = playlist.imageUrls[0];
+          const firstVideoId = playlist.videos[0]?.videoId;
+          const thumbnail =
+            playlist.imageUrls[0] ||
+            (firstVideoId ? getYouTubeThumbnailUrl(firstVideoId, 'hqdefault') : undefined);
 
           return (
             <div
@@ -60,12 +65,23 @@ export function PlaylistsPage() {
               className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
             >
               <div className="p-5 space-y-3">
-                {thumbnail && (
+                {thumbnail ? (
                   <img
                     src={thumbnail}
                     alt={playlist.title}
-                    className="w-full h-36 object-cover rounded-xl mb-3"
+                    className="w-full h-36 object-cover rounded-xl mb-3 bg-slate-100 dark:bg-slate-800"
+                    onError={(e) => {
+                      if (firstVideoId && e.currentTarget.src !== getYouTubeThumbnailUrl(firstVideoId, 'hqdefault')) {
+                        e.currentTarget.src = getYouTubeThumbnailUrl(firstVideoId, 'hqdefault');
+                      } else {
+                        e.currentTarget.style.display = 'none';
+                      }
+                    }}
                   />
+                ) : (
+                  <div className="w-full h-36 bg-slate-100 dark:bg-slate-800 rounded-xl mb-3 flex items-center justify-center text-slate-400">
+                    <Film className="w-8 h-8 opacity-40" />
+                  </div>
                 )}
 
                 <div className="flex items-start justify-between gap-2">
@@ -100,32 +116,19 @@ export function PlaylistsPage() {
 
                 {/* Expanded Video List */}
                 {isExpanded && (
-                  <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 space-y-2 max-h-60 overflow-y-auto">
+                  <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 space-y-3 max-h-72 overflow-y-auto">
                     {playlist.videos.length === 0 ? (
                       <span className="text-xs text-slate-400">No videos in playlist</span>
                     ) : (
                       playlist.videos.map((v, idx) => (
                         <div
                           key={`${v.videoId}-${idx}`}
-                          className="flex items-center justify-between text-xs py-1 px-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/50"
+                          className="flex items-center justify-between text-xs p-2 rounded-xl bg-white dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50"
                         >
-                          <span className="font-mono text-slate-600 dark:text-slate-400">
-                            {v.videoId}
+                          <VideoPreviewCell videoId={v.videoId} className="flex-1" />
+                          <span className="text-[10px] text-slate-400 flex-shrink-0 ml-2">
+                            {formatDate(v.addedAt)}
                           </span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-slate-400">
-                              {formatDate(v.addedAt)}
-                            </span>
-                            <a
-                              href={`https://www.youtube.com/watch?v=${v.videoId.trim()}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-red-600 dark:text-red-400 hover:underline flex items-center gap-0.5"
-                            >
-                              <span>Watch</span>
-                              <ExternalLink className="w-2.5 h-2.5" />
-                            </a>
-                          </div>
                         </div>
                       ))
                     )}

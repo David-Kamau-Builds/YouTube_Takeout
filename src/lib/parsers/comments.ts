@@ -13,26 +13,52 @@ interface RawComment {
   'Top-Level Comment ID'?: string;
 }
 
-function parseTextSegments(rawText: string): { segments: CommentTextSegment[]; plainText: string } {
-  if (!rawText) return { segments: [], plainText: '' };
-  
-  try {
-    // rawText can be double JSON encoded or standard JSON array string
-    const parsed = typeof rawText === 'string' ? JSON.parse(rawText) : rawText;
-    
-    if (Array.isArray(parsed)) {
-      const segments = parsed as CommentTextSegment[];
-      const plainText = segments.map(s => s.text || '').join('');
-      return { segments, plainText };
-    } else if (typeof parsed === 'string') {
-      return { segments: [{ text: parsed }], plainText: parsed };
-    }
-  } catch {
-    // If parse fails, return raw text directly
-    return { segments: [{ text: rawText }], plainText: rawText };
+function parseTextSegments(rawText?: string): { segments: CommentTextSegment[]; plainText: string; hasCustomEmoji: boolean } {
+  if (!rawText || typeof rawText !== 'string' || !rawText.trim()) {
+    return { segments: [], plainText: '', hasCustomEmoji: false };
   }
 
-  return { segments: [], plainText: rawText };
+  const trimmed = rawText.trim();
+  let parsed: any = null;
+
+  try {
+    parsed = JSON.parse(trimmed);
+  } catch {
+    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+      try {
+        parsed = JSON.parse(`[${trimmed}]`);
+      } catch {
+        parsed = null;
+      }
+    }
+  }
+
+  if (parsed) {
+    let segments: CommentTextSegment[] = [];
+    if (Array.isArray(parsed)) {
+      segments = parsed as CommentTextSegment[];
+    } else if (typeof parsed === 'object') {
+      segments = [parsed as CommentTextSegment];
+    } else if (typeof parsed === 'string') {
+      segments = [{ text: parsed }];
+    }
+
+    const hasCustomEmoji = segments.some(s => Boolean(s.emoji?.customEmojiUrl || s.customEmojiUrl));
+    const textPieces = segments.map(s => s.text || '').filter(Boolean);
+    let plainText = textPieces.join('');
+
+    if (!plainText.trim()) {
+      if (hasCustomEmoji) {
+        plainText = '(Custom Emoji)';
+      } else if (segments.length > 0) {
+        plainText = '(Emoji / Non-text message)';
+      }
+    }
+
+    return { segments, plainText, hasCustomEmoji };
+  }
+
+  return { segments: [{ text: trimmed }], plainText: trimmed, hasCustomEmoji: false };
 }
 
 export async function loadComments(): Promise<Comment[]> {
@@ -42,7 +68,7 @@ export async function loadComments(): Promise<Comment[]> {
     .filter(row => row && row['Comment ID'])
     .map(row => {
       const rawText = row['Comment Text'] || '';
-      const { segments, plainText } = parseTextSegments(rawText);
+      const { segments, plainText, hasCustomEmoji } = parseTextSegments(rawText);
       const parentId = row['Parent Comment ID'] ? String(row['Parent Comment ID']).trim() : undefined;
 
       return {
@@ -58,6 +84,7 @@ export async function loadComments(): Promise<Comment[]> {
         plainText,
         topLevelCommentId: row['Top-Level Comment ID'] ? String(row['Top-Level Comment ID']).trim() : undefined,
         isReply: Boolean(parentId),
+        hasCustomEmoji,
       };
     });
 }

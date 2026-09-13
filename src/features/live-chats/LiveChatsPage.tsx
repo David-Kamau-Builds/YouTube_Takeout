@@ -9,7 +9,9 @@ import { Badge } from '../../components/ui/Badge';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ErrorFallback } from '../../components/ui/ErrorFallback';
 import { formatDateTime } from '../../lib/format/dates';
-import { MessageCircle, ExternalLink, Smile } from 'lucide-react';
+import { MessageCircle, Smile } from 'lucide-react';
+import { FormattedMessageText } from '../../components/ui/FormattedMessageText';
+import { VideoPreviewCell } from '../../components/ui/VideoPreviewCell';
 
 export function LiveChatsPage() {
   const { data: liveChats = [], isLoading, isError, refetch } = useQuery({
@@ -47,9 +49,10 @@ export function LiveChatsPage() {
           const chat = info.row.original;
           return (
             <div className="flex items-center gap-2 py-1 max-w-xl">
-              <span className="text-sm text-slate-900 dark:text-white font-normal">
-                {chat.plainText || '(Emoji / Non-text message)'}
-              </span>
+              <FormattedMessageText
+                segments={chat.textSegments}
+                fallbackText={chat.plainText}
+              />
               {chat.hasCustomEmoji && (
                 <Badge variant="amber">
                   <Smile className="w-3 h-3 mr-1" />
@@ -65,17 +68,7 @@ export function LiveChatsPage() {
         header: 'Live Stream Link',
         cell: (info) => {
           const videoId = info.getValue<string>();
-          return (
-            <a
-              href={`https://www.youtube.com/watch?v=${videoId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-red-600 hover:text-red-700 dark:text-red-400 font-medium text-xs flex items-center gap-1"
-            >
-              <span>Watch Stream</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          );
+          return <VideoPreviewCell videoId={videoId} fallbackLabel="Live Stream" />;
         },
       },
     ],

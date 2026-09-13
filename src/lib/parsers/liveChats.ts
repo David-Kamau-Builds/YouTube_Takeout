@@ -11,27 +11,51 @@ interface RawLiveChat {
 }
 
 function parseTextSegments(rawText?: string): { segments: CommentTextSegment[]; plainText: string; hasCustomEmoji: boolean } {
-  if (!rawText) return { segments: [], plainText: '', hasCustomEmoji: false };
-
-  try {
-    const parsed = typeof rawText === 'string' ? JSON.parse(rawText) : rawText;
-
-    if (Array.isArray(parsed)) {
-      const segments = parsed as CommentTextSegment[];
-      const plainText = segments.map(s => s.text || '').join('');
-      const hasCustomEmoji = segments.some(s => Boolean(s.emoji?.customEmojiUrl));
-      return { segments, plainText, hasCustomEmoji };
-    } else if (typeof parsed === 'object' && parsed !== null) {
-      const seg = parsed as CommentTextSegment;
-      const plainText = seg.text || '';
-      const hasCustomEmoji = Boolean(seg.emoji?.customEmojiUrl);
-      return { segments: [seg], plainText, hasCustomEmoji };
-    }
-  } catch {
-    return { segments: [{ text: rawText }], plainText: rawText, hasCustomEmoji: false };
+  if (!rawText || typeof rawText !== 'string' || !rawText.trim()) {
+    return { segments: [], plainText: '', hasCustomEmoji: false };
   }
 
-  return { segments: [], plainText: rawText || '', hasCustomEmoji: false };
+  const trimmed = rawText.trim();
+  let parsed: any = null;
+
+  try {
+    parsed = JSON.parse(trimmed);
+  } catch {
+    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+      try {
+        parsed = JSON.parse(`[${trimmed}]`);
+      } catch {
+        parsed = null;
+      }
+    }
+  }
+
+  if (parsed) {
+    let segments: CommentTextSegment[] = [];
+    if (Array.isArray(parsed)) {
+      segments = parsed as CommentTextSegment[];
+    } else if (typeof parsed === 'object') {
+      segments = [parsed as CommentTextSegment];
+    } else if (typeof parsed === 'string') {
+      segments = [{ text: parsed }];
+    }
+
+    const hasCustomEmoji = segments.some(s => Boolean(s.emoji?.customEmojiUrl || s.customEmojiUrl));
+    const textPieces = segments.map(s => s.text || '').filter(Boolean);
+    let plainText = textPieces.join('');
+
+    if (!plainText.trim()) {
+      if (hasCustomEmoji) {
+        plainText = '(Custom Emoji)';
+      } else if (segments.length > 0) {
+        plainText = '(Emoji / Non-text message)';
+      }
+    }
+
+    return { segments, plainText, hasCustomEmoji };
+  }
+
+  return { segments: [{ text: trimmed }], plainText: trimmed, hasCustomEmoji: false };
 }
 
 export async function loadLiveChats(): Promise<LiveChat[]> {
