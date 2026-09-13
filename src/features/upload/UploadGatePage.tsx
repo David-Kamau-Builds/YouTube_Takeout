@@ -10,7 +10,6 @@ import {
   FileArchive,
   HardDrive,
 } from 'lucide-react';
-import { YouTubeLogo } from '../../components/ui/YouTubeLogo';
 import { TakeoutGuide } from '../../components/takeout/TakeoutGuide';
 
 export function UploadGatePage() {
@@ -82,28 +81,36 @@ export function UploadGatePage() {
   return (
     <div className="min-h-screen bg-[#fbfbfd] dark:bg-[#0d0e11] text-neutral-900 dark:text-neutral-100 flex flex-col justify-between p-4 sm:p-8 selection:bg-red-500/10">
       {/* Top Bar */}
-      <header className="max-w-5xl w-full mx-auto flex items-center justify-between py-2">
-        <div className="flex items-center gap-2.5">
-          <YouTubeLogo className="w-7 h-7" />
-          <div className="flex flex-col">
-            <span className="font-semibold text-sm tracking-tight text-neutral-900 dark:text-neutral-100">
-              YouTube Takeout
-            </span>
-          </div>
-        </div>
+      <header className="relative z-10 max-w-5xl w-full mx-auto flex items-center justify-between py-2">
+        <span className="font-semibold text-sm tracking-tight text-neutral-900 dark:text-neutral-100">
+          YouTube Takeout
+        </span>
         <ThemeToggle />
       </header>
 
       {/* Main Container */}
-      <main className="max-w-3xl w-full mx-auto my-6 space-y-6">
-        {/* Header Title Section */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-neutral-950 dark:text-white">
-            Import YouTube Archive
-          </h1>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-xl mx-auto leading-relaxed">
-            Extract, index, and analyze your watch history, playlist habits, and YouTube Music library entirely inside your browser.
-          </p>
+      <main className="relative z-10 max-w-3xl w-full mx-auto my-6 space-y-6">
+        {/* Header Title Section with Apple/Google Left-Aligned Lockup */}
+        <div className="relative flex flex-col sm:flex-row items-center sm:items-center gap-5 sm:gap-6 py-2 px-1">
+          {/* 3D Takeout Box Graphic on the Left */}
+          <div className="relative group shrink-0">
+            <img
+              src={`${(import.meta.env.BASE_URL ?? '/').replace(/\/+$/, '')}/logo.webp`}
+              alt="YouTube Takeout"
+              className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain select-none drop-shadow-md transition-transform duration-500 hover:scale-105 transform-gpu"
+              draggable={false}
+            />
+          </div>
+
+          {/* Title & Description Text */}
+          <div className="space-y-1.5 min-w-0 flex-1 text-center">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-neutral-950 dark:text-white text-center">
+              Import YouTube Archive
+            </h1>
+            <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto leading-relaxed text-center">
+              Extract, index, and analyze your watch history, playlist habits, and YouTube Music library entirely inside your browser.
+            </p>
+          </div>
         </div>
 
         {/* Upload Container */}
@@ -240,7 +247,7 @@ export function UploadGatePage() {
       </main>
 
       {/* Subtle Footer */}
-      <footer className="text-center text-[11px] text-neutral-400 dark:text-neutral-600 py-3">
+      <footer className="relative z-10 text-center text-[11px] text-neutral-400 dark:text-neutral-600 py-3">
         YouTube Takeout
       </footer>
     </div>
