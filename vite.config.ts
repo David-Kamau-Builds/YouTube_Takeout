@@ -8,6 +8,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  worker: {
+    format: 'es',
+  },
   build: {
     chunkSizeWarningLimit: 1000,
     rollupOptions: {

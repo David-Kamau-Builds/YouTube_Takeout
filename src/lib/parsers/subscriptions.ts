@@ -1,4 +1,5 @@
-import { fetchCsv } from '../data/fetchCsv';
+import { fileLoader } from '../takeout/fileLoader';
+import { parseCsvText } from '../data/fetchCsv';
 import type { Subscription } from '../../types';
 
 interface RawSubscription {
@@ -8,7 +9,8 @@ interface RawSubscription {
 }
 
 export async function loadSubscriptions(): Promise<Subscription[]> {
-  const raw = await fetchCsv<RawSubscription>('/data/subscriptions/subscriptions.csv');
+  const text = await fileLoader.readText('subscriptions/subscriptions.csv');
+  const raw = await parseCsvText<RawSubscription>(text);
   return raw
     .filter(row => row && row['Channel Id'])
     .map(row => ({

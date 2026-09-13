@@ -1,12 +1,6 @@
 import Papa from 'papaparse';
 
-export async function fetchCsv<T>(url: string): Promise<T[]> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch CSV ${url}: ${response.status} ${response.statusText}`);
-  }
-  const text = await response.text();
-
+export function parseCsvText<T>(text: string): Promise<T[]> {
   return new Promise<T[]>((resolve, reject) => {
     Papa.parse<T>(text, {
       header: true,
@@ -16,4 +10,13 @@ export async function fetchCsv<T>(url: string): Promise<T[]> {
       error: (error: Error) => reject(error),
     });
   });
+}
+
+export async function fetchCsv<T>(url: string): Promise<T[]> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch CSV ${url}: ${response.status} ${response.statusText}`);
+  }
+  const text = await response.text();
+  return parseCsvText<T>(text);
 }

@@ -23,8 +23,15 @@ dist-ssr
 *.sln
 *.sw?
 
-# Data / Takeout
-/Takeout
-Takeout/
-takeout/
+# Data / Takeout (root-level export folders and archives only)
+/Takeout/
+/takeout/
 *.zip
+*.tar
+*.tar.gz
+*.tgz
+*.tz
+/public/data/
+
+# Explicitly ensure source code is never ignored
+!src/**

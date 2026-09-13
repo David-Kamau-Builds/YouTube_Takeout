@@ -1,4 +1,5 @@
-import { fetchCsv } from '../data/fetchCsv';
+import { fileLoader } from '../takeout/fileLoader';
+import { parseCsvText } from '../data/fetchCsv';
 import type { Comment, CommentTextSegment } from '../../types';
 
 interface RawComment {
@@ -62,7 +63,8 @@ function parseTextSegments(rawText?: string): { segments: CommentTextSegment[]; 
 }
 
 export async function loadComments(): Promise<Comment[]> {
-  const raw = await fetchCsv<RawComment>('/data/comments/comments.csv');
+  const text = await fileLoader.readText('comments/comments.csv');
+  const raw = await parseCsvText<RawComment>(text);
   
   return raw
     .filter(row => row && row['Comment ID'])

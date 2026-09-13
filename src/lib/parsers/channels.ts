@@ -1,4 +1,5 @@
-import { fetchCsv } from '../data/fetchCsv';
+import { fileLoader } from '../takeout/fileLoader';
+import { parseCsvText } from '../data/fetchCsv';
 import type { ChannelProfile } from '../../types';
 
 interface RawChannel {
@@ -20,12 +21,21 @@ interface RawChannelFeature {
   'Video Default License': string;
 }
 
+async function safeLoadCsv<T>(path: string): Promise<T[]> {
+  try {
+    const text = await fileLoader.readText(path);
+    return await parseCsvText<T>(text);
+  } catch {
+    return [];
+  }
+}
+
 export async function loadChannelProfile(): Promise<ChannelProfile | null> {
   try {
     const [channels, urls, features] = await Promise.all([
-      fetchCsv<RawChannel>('/data/channels/channel.csv'),
-      fetchCsv<RawChannelUrl>('/data/channels/channel URL configs.csv').catch(() => []),
-      fetchCsv<RawChannelFeature>('/data/channels/channel feature data.csv').catch(() => []),
+      safeLoadCsv<RawChannel>('channels/channel.csv'),
+      safeLoadCsv<RawChannelUrl>('channels/channel URL configs.csv'),
+      safeLoadCsv<RawChannelFeature>('channels/channel feature data.csv'),
     ]);
 
     if (!channels || channels.length === 0 || !channels[0]['Channel ID']) {
