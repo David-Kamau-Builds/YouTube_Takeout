@@ -10,7 +10,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ErrorFallback } from '../../components/ui/ErrorFallback';
 import { formatDateTime } from '../../lib/format/dates';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, History } from 'lucide-react';
 
 export function HistoryPage() {
   const { data: history = [], isLoading, isError, refetch } = useWatchHistoryData();
@@ -58,71 +58,55 @@ export function HistoryPage() {
       {
         accessorKey: 'time',
         header: 'Date & Time',
-        size: 195,
+        size: 190,
         cell: (info) => (
-          <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+          <span className="text-xs text-slate-500 font-mono">
             {formatDateTime(info.getValue<string>())}
           </span>
         ),
       },
       {
         accessorKey: 'title',
-        header: 'Title',
-        meta: { flex: '3 1 0%' },
+        header: 'Title & Channel',
         cell: (info) => {
-          const record = info.row.original;
+          const item = info.row.original;
           return (
-            <div className="flex items-center gap-1.5 w-full min-w-0">
-              {record.titleUrl ? (
-                <a
-                  href={record.titleUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-slate-900 dark:text-white hover:text-red-600 dark:hover:text-red-400 transition-colors flex items-center gap-1 group truncate"
-                >
-                  <span className="truncate">{record.title}</span>
-                  <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 text-red-500" />
-                </a>
-              ) : (
-                <span className="font-medium text-slate-900 dark:text-white truncate">
-                  {record.title}
+            <div className="flex flex-col min-w-0 pr-4">
+              <span
+                className="font-medium text-slate-900 dark:text-slate-100 truncate text-sm"
+                title={item.title}
+              >
+                {item.title}
+              </span>
+              <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                <span className="truncate max-w-[200px]" title={item.channelName}>
+                  {item.channelName || 'Unknown Channel'}
                 </span>
-              )}
+                {item.titleUrl && (
+                  <a
+                    href={item.titleUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors shrink-0"
+                    title="Open on YouTube"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+              </div>
             </div>
           );
         },
       },
       {
-        accessorKey: 'channelName',
-        header: 'Channel / Artist',
-        meta: { flex: '2 1 0%' },
-        cell: (info) => {
-          const record = info.row.original;
-          return record.channelUrl ? (
-            <a
-              href={record.channelUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-slate-600 dark:text-slate-300 hover:underline truncate block"
-            >
-              {record.channelName}
-            </a>
-          ) : (
-            <span className="text-slate-600 dark:text-slate-300 truncate block">
-              {record.channelName}
-            </span>
-          );
-        },
-      },
-      {
-        accessorKey: 'header',
+        accessorKey: 'isMusic',
         header: 'Product',
-        size: 140,
+        size: 130,
         cell: (info) => {
-          const isMusic = info.row.original.isMusic;
+          const isMusic = info.getValue<boolean>();
           return (
-            <Badge variant={isMusic ? 'blue' : 'red'}>
-              {isMusic ? 'YouTube Music' : 'YouTube'}
+            <Badge variant={isMusic ? 'blue' : 'slate'}>
+              {isMusic ? 'YT Music' : 'YouTube'}
             </Badge>
           );
         },
@@ -159,17 +143,31 @@ export function HistoryPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          Watch & Activity History
-        </h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Search, filter, and sort your complete YouTube watch log ({history.length} records).
-        </p>
+      {/* Executive Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl shadow-xs">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/15 shrink-0">
+            <History className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-semibold text-neutral-950 dark:text-white tracking-tight">
+              Watch & Activity History
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+              Search, filter, and inspect your YouTube watch log and playback events.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="px-3 py-1.5 rounded-xl bg-neutral-50 dark:bg-white/5 border border-black/5 dark:border-white/5 text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+            <span className="tabular-nums font-semibold text-neutral-900 dark:text-white">{history.length.toLocaleString()}</span> total records
+          </div>
+        </div>
       </div>
 
       {/* Filter Controls Bar */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+      <div className="bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl p-4 shadow-xs flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
         <div className="flex-1 max-w-md">
           <SearchInput
             value={search}

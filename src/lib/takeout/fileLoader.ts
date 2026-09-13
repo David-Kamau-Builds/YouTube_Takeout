@@ -28,11 +28,43 @@ export const fileLoader = {
   },
 
   /**
+   * Reads raw text content of a file, or returns null if not found.
+   */
+  async readTextOptional(normalizedKey: string): Promise<string | null> {
+    if (currentSource === 'none') {
+      return null;
+    }
+    const content = await loadFile(normalizedKey);
+    return content ?? null;
+  },
+
+  /**
    * Reads and parses JSON content.
    */
   async readJson<T>(normalizedKey: string): Promise<T> {
     const text = await this.readText(normalizedKey);
     return JSON.parse(text) as T;
+  },
+
+  /**
+   * Reads and parses JSON content, or returns null if not found or invalid.
+   */
+  async readJsonOptional<T>(normalizedKey: string): Promise<T | null> {
+    const text = await this.readTextOptional(normalizedKey);
+    if (!text) return null;
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      return null;
+    }
+  },
+
+  /**
+   * Checks if a file exists in the loaded storage.
+   */
+  async hasFile(normalizedKey: string): Promise<boolean> {
+    const content = await this.readTextOptional(normalizedKey);
+    return content !== null;
   },
 
   /**

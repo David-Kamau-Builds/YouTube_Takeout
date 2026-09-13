@@ -4,9 +4,7 @@ import {
   Pie,
   Cell,
   Tooltip,
-  Legend,
 } from 'recharts';
-import { useTheme } from '../../hooks/useTheme';
 
 interface DonutChartProps {
   videosCount: number;
@@ -14,14 +12,35 @@ interface DonutChartProps {
   title?: string;
 }
 
-const COLORS = ['#ef4444', '#3b82f6'];
+const COLORS = ['#dc2626', '#2563eb'];
+
+interface CustomDonutTooltipProps {
+  active?: boolean;
+  payload?: Array<{ name: string; value: number }>;
+}
+
+function CustomDonutTooltip({ active, payload }: CustomDonutTooltipProps) {
+  if (!active || !payload || !payload.length) return null;
+  const item = payload[0];
+
+  return (
+    <div className="px-3 py-1.5 rounded-xl bg-neutral-900/90 dark:bg-[#1f2128]/95 backdrop-blur-md text-white border border-white/10 shadow-xl text-xs space-y-0.5">
+      <div className="text-[11px] text-neutral-400">{item.name}</div>
+      <div className="font-semibold tabular-nums text-white">
+        {item.value.toLocaleString()} events
+      </div>
+    </div>
+  );
+}
 
 export function DonutChart({
   videosCount,
   musicCount,
-  title = 'YouTube vs. Music Split',
+  title = 'Media Distribution',
 }: DonutChartProps) {
-  const { isDark } = useTheme();
+  const total = videosCount + musicCount;
+  const videoPercent = total > 0 ? Math.round((videosCount / total) * 100) : 0;
+  const musicPercent = total > 0 ? 100 - videoPercent : 0;
 
   const data = [
     { name: 'YouTube Videos', value: videosCount },
@@ -29,39 +48,69 @@ export function DonutChart({
   ];
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col justify-between transition-all duration-200 h-full">
-      <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight mb-4">
-        {title}
-      </h3>
-      <div className="h-64 w-full">
+    <div className="bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col justify-between transition-all duration-200 h-full">
+      <div>
+        <h3 className="text-sm font-semibold text-neutral-900 dark:text-white tracking-tight">
+          {title}
+        </h3>
+        <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+          Video vs. Music breakdown
+        </p>
+      </div>
+
+      <div className="h-48 w-full relative my-2">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={60}
-              outerRadius={90}
-              paddingAngle={5}
+              innerRadius={55}
+              outerRadius={75}
+              paddingAngle={4}
               dataKey="value"
+              stroke="transparent"
             >
               {data.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-                borderColor: isDark ? '#334155' : '#e2e8f0',
-                borderRadius: '0.75rem',
-                color: isDark ? '#fff' : '#0f172a',
-                fontSize: '12px',
-                boxShadow: isDark ? '0 10px 15px -3px rgba(0,0,0,0.5)' : '0 10px 15px -3px rgba(0,0,0,0.1)',
-              }}
-            />
-            <Legend verticalAlign="bottom" height={36} />
+            <Tooltip content={<CustomDonutTooltip />} />
           </PieChart>
         </ResponsiveContainer>
+
+        {/* Center label */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <span className="text-lg font-bold text-neutral-950 dark:text-white tabular-nums tracking-tight">
+            {videoPercent}%
+          </span>
+          <span className="text-[10px] uppercase font-semibold text-neutral-400 tracking-wider">
+            Video
+          </span>
+        </div>
+      </div>
+
+      {/* Sleek bottom legend */}
+      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-black/5 dark:border-white/5 text-xs">
+        <div className="flex items-center justify-between p-2 rounded-xl bg-neutral-50 dark:bg-white/5">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-red-600" />
+            <span className="text-[11px] text-neutral-600 dark:text-neutral-400">Videos</span>
+          </div>
+          <span className="text-[11px] font-semibold tabular-nums text-neutral-900 dark:text-white">
+            {videoPercent}%
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between p-2 rounded-xl bg-neutral-50 dark:bg-white/5">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-600" />
+            <span className="text-[11px] text-neutral-600 dark:text-neutral-400">Music</span>
+          </div>
+          <span className="text-[11px] font-semibold tabular-nums text-neutral-900 dark:text-white">
+            {musicPercent}%
+          </span>
+        </div>
       </div>
     </div>
   );

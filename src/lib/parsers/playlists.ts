@@ -22,7 +22,9 @@ interface RawPlaylistVideo {
 }
 
 export async function loadPlaylists(): Promise<Playlist[]> {
-  const text = await fileLoader.readText('playlists/playlists.csv');
+  const text = await fileLoader.readTextOptional('playlists/playlists.csv');
+  if (!text) return [];
+
   const rawPlaylists = await parseCsvText<RawPlaylist>(text);
   const storedKeys = await fileLoader.listStoredKeys('playlists/');
   const playlistPromises = rawPlaylists

@@ -15,6 +15,10 @@ export function shouldExtractFileName(filePath: string): boolean {
   if (parts.length <= 1) return false;
   const ext = parts.pop()?.toLowerCase() ?? '';
   if (MEDIA_EXTENSIONS.has(ext)) return false;
+  if (ext === 'html' || ext === 'htm') {
+    const lower = filePath.toLowerCase();
+    return lower.includes('watch-history') || lower.includes('history');
+  }
   return ALLOWED_EXTENSIONS.has(ext);
 }
 

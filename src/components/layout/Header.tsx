@@ -1,15 +1,18 @@
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { AccentColorPicker } from './AccentColorPicker';
 import { DatasetStatusBadge } from '../takeout/DatasetStatusBadge';
+import { YouTubeLogo } from '../ui/YouTubeLogo';
 
 const ROUTE_NAMES: Record<string, string> = {
-  '/': 'Dashboard',
+  '/': 'Overview',
   '/history': 'Watch History',
-  '/music': 'Music Hub',
+  '/music': 'Music Library',
   '/subscriptions': 'Subscriptions',
   '/playlists': 'Playlists',
-  '/channels': 'Channel Profile',
+  '/channels': 'Channel Stats',
   '/comments': 'Comments',
   '/live-chats': 'Live Chats',
   '/rewind': 'Yearly Rewind',
@@ -21,25 +24,42 @@ interface HeaderProps {
 
 export function Header({ onOpenMobileSidebar }: HeaderProps) {
   const location = useLocation();
-  const title = ROUTE_NAMES[location.pathname] || 'Takeout Analytics';
+  const activeTitle = ROUTE_NAMES[location.pathname] || 'Analytics';
+
+  useEffect(() => {
+    document.title = `${activeTitle} • YouTube Takeout Visualizer`;
+  }, [activeTitle]);
 
   return (
-    <header className="sticky top-0 z-30 h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-4 lg:px-8 flex items-center justify-between transition-colors">
+    <header className="sticky top-0 z-30 h-14 border-b border-black/6 dark:border-white/8 bg-white/80 dark:bg-[#0d0e11]/80 backdrop-blur-xl px-4 lg:px-8 flex items-center justify-between transition-colors">
       <div className="flex items-center gap-3">
         <button
           onClick={onOpenMobileSidebar}
           type="button"
-          className="lg:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label="Open sidebar menu"
+          className="lg:hidden p-1.5 rounded-lg text-neutral-500 dark:text-neutral-400 hover:bg-black/5 dark:hover:bg-white/10"
+          aria-label="Open navigation menu"
         >
           <Menu className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-          {title}
-        </h1>
+
+        {/* Minimalist Apple/Google Breadcrumb with authentic logo */}
+        <div className="flex items-center gap-2.5 text-xs">
+          <div className="flex items-center gap-2">
+            <YouTubeLogo className="w-5 h-5 shrink-0" />
+            <span className="text-neutral-500 dark:text-neutral-400 hidden sm:inline font-medium">
+              YouTube Takeout
+            </span>
+          </div>
+          <span className="text-neutral-300 dark:text-neutral-700 hidden sm:inline">/</span>
+          <span className="font-semibold text-neutral-900 dark:text-white tracking-tight text-sm">
+            {activeTitle}
+          </span>
+        </div>
       </div>
-      <div className="flex items-center gap-3">
+
+      <div className="flex items-center gap-2">
         <DatasetStatusBadge />
+        <AccentColorPicker />
         <ThemeToggle />
       </div>
     </header>

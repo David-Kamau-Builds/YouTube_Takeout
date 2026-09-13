@@ -41,14 +41,27 @@ export function PlaylistsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-          <ListVideo className="w-6 h-6 text-red-600" />
-          <span>Playlists ({playlists.length})</span>
-        </h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Your saved playlists and video collections.
-        </p>
+      {/* Executive Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl shadow-xs">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border border-emerald-500/15 shrink-0">
+            <ListVideo className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-semibold text-neutral-950 dark:text-white tracking-tight">
+              Playlists & Collections
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+              Your curated playlists, video collections, and saved mixes.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="px-3 py-1.5 rounded-xl bg-neutral-50 dark:bg-white/5 border border-black/5 dark:border-white/5 text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+            <span className="tabular-nums font-semibold text-neutral-900 dark:text-white">{playlists.length.toLocaleString()}</span> playlists
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -62,7 +75,7 @@ export function PlaylistsPage() {
           return (
             <div
               key={playlist.playlistId}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+              className="bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl overflow-hidden shadow-xs hover:shadow-sm transition-all flex flex-col justify-between"
             >
               <div className="p-5 space-y-3">
                 {thumbnail ? (

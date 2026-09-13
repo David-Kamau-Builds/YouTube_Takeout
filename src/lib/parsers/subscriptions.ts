@@ -9,7 +9,9 @@ interface RawSubscription {
 }
 
 export async function loadSubscriptions(): Promise<Subscription[]> {
-  const text = await fileLoader.readText('subscriptions/subscriptions.csv');
+  const text = await fileLoader.readTextOptional('subscriptions/subscriptions.csv');
+  if (!text) return [];
+
   const raw = await parseCsvText<RawSubscription>(text);
   return raw
     .filter(row => row && row['Channel Id'])

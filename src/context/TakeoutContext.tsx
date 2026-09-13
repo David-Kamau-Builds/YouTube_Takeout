@@ -1,27 +1,11 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { ActiveSource, TakeoutManifest } from '../types/takeout';
 import { MAX_UPLOAD_BYTES, UploadSizeError } from '../types/takeout';
 import { fileLoader } from '../lib/takeout/fileLoader';
 import { getMeta, saveFiles, clearAll } from '../lib/takeout/indexedDbStorage';
 import { shouldExtractFileName } from '../lib/takeout/archiveExtractor';
-import { queryClient } from '../app/providers';
-
-interface TakeoutContextType {
-  activeSource: ActiveSource;
-  isInitialLoading: boolean;
-  isExtracting: boolean;
-  progress: number;
-  statusMessage: string;
-  manifest: TakeoutManifest | null;
-  uploadError: string | null;
-  isUploadModalOpen: boolean;
-  openUploadModal: () => void;
-  closeUploadModal: () => void;
-  uploadFiles: (files: File[]) => Promise<void>;
-  clearUploadedData: () => Promise<void>;
-}
-
-const TakeoutContext = createContext<TakeoutContextType | undefined>(undefined);
+import { queryClient } from '../lib/queryClient';
+import { TakeoutContext } from './takeoutContextDef';
 
 export function TakeoutProvider({ children }: { children: ReactNode }) {
   const [activeSource, setActiveSourceState] = useState<ActiveSource>('none');
@@ -215,12 +199,4 @@ export function TakeoutProvider({ children }: { children: ReactNode }) {
       {children}
     </TakeoutContext.Provider>
   );
-}
-
-export function useTakeout(): TakeoutContextType {
-  const context = useContext(TakeoutContext);
-  if (!context) {
-    throw new Error('useTakeout must be used within a TakeoutProvider');
-  }
-  return context;
 }
