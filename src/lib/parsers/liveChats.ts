@@ -60,7 +60,9 @@ function parseTextSegments(rawText?: string): { segments: CommentTextSegment[]; 
 }
 
 export async function loadLiveChats(): Promise<LiveChat[]> {
-  const text = await fileLoader.readText('live-chats/live chats.csv');
+  const text = await fileLoader.readTextOptional('live-chats/live chats.csv');
+  if (!text) return [];
+
   const raw = await parseCsvText<RawLiveChat>(text);
 
   return raw

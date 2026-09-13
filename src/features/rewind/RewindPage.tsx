@@ -36,20 +36,24 @@ export function RewindPage() {
   }));
 
   return (
-    <div className="space-y-8">
-      {/* Header + Year Select */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
-            <Sparkles className="w-7 h-7 text-amber-500 animate-pulse" />
-            <span>Yearly Rewind Summary</span>
-          </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Your personalized annual YouTube and YouTube Music highlights.
-          </p>
+    <div className="space-y-6">
+      {/* Executive Header + Year Select */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl shadow-xs">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="p-2.5 rounded-xl bg-pink-500/10 text-pink-500 dark:text-pink-400 border border-pink-500/15 shrink-0">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-semibold text-neutral-950 dark:text-white tracking-tight">
+              Yearly Rewind
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+              Personalized annual retrospective for your YouTube watch habits and music streaming.
+            </p>
+          </div>
         </div>
 
-        <div>
+        <div className="w-full sm:w-44 self-start sm:self-auto">
           <Select
             value={String(year)}
             onChange={(val) => setYear(Number(val))}
@@ -59,95 +63,91 @@ export function RewindPage() {
         </div>
       </div>
 
-      {/* Hero Rewind Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-600 via-purple-600 to-indigo-700 p-8 lg:p-10 text-white shadow-xl">
+      {/* Hero Rewind Banner - Apple Replay style */}
+      <div className="relative overflow-hidden rounded-3xl bg-neutral-900 dark:bg-[#13151a] border border-neutral-800 dark:border-white/10 p-8 lg:p-10 text-white shadow-xs">
         <div className="relative z-10 space-y-4 max-w-2xl">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase tracking-wider text-white">
-            <Sparkles className="w-3.5 h-3.5" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold tracking-wide text-neutral-200 border border-white/10">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             Rewind {stats.year}
           </span>
-          <h3 className="text-4xl lg:text-5xl font-black tracking-tight leading-tight">
-            ~{stats.totalEstimatedHours} Hours of Watch & Music Time
+          <h3 className="text-3xl lg:text-4xl font-bold tracking-tight leading-tight">
+            ~{stats.totalEstimatedHours.toLocaleString()} Hours of Watch & Music Time
           </h3>
-          <p className="text-base text-white/80 font-medium">
-            You played <strong>{stats.totalVideos}</strong> videos and <strong>{stats.totalMusicTracks}</strong> songs in {stats.year}.
+          <p className="text-sm sm:text-base text-neutral-300 font-medium">
+            You streamed <strong className="text-white">{stats.totalVideos.toLocaleString()}</strong> videos and <strong className="text-white">{stats.totalMusicTracks.toLocaleString()}</strong> songs in {stats.year}.
           </p>
         </div>
-
-        {/* Ambient background blur elements */}
-        <div className="absolute -bottom-10 -right-10 w-72 h-72 bg-amber-400/20 rounded-full blur-3xl" />
-        <div className="absolute -top-10 -left-10 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl" />
       </div>
 
       {/* Highlights Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-2">
-          <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-600 w-fit">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl p-5 space-y-2 shadow-xs">
+          <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/15 w-fit">
             <Flame className="w-5 h-5" />
           </div>
-          <div className="text-2xl font-extrabold text-slate-900 dark:text-white">
+          <div className="text-2xl font-bold text-neutral-950 dark:text-white tabular-nums">
             {stats.longestStreakDays} Days
           </div>
-          <div className="text-xs text-slate-400">Longest Active Watching Streak</div>
+          <div className="text-xs text-neutral-500 dark:text-neutral-400">Longest Active Watching Streak</div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-2">
-          <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-600 w-fit">
+        <div className="bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl p-5 space-y-2 shadow-xs">
+          <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/15 w-fit">
             <Calendar className="w-5 h-5" />
           </div>
-          <div className="text-2xl font-extrabold text-slate-900 dark:text-white">
+          <div className="text-2xl font-bold text-neutral-950 dark:text-white tabular-nums">
             {stats.mostActiveDayCount} items
           </div>
-          <div className="text-xs text-slate-400">
+          <div className="text-xs text-neutral-500 dark:text-neutral-400">
             Most Active Day ({formatDate(stats.mostActiveDayDate)})
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-2">
-          <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-600 w-fit">
+        <div className="bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl p-5 space-y-2 shadow-xs">
+          <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/15 w-fit">
             <Clock className="w-5 h-5" />
           </div>
-          <div className="text-2xl font-extrabold text-slate-900 dark:text-white">
+          <div className="text-2xl font-bold text-neutral-950 dark:text-white tabular-nums">
             {stats.mostActiveHour}:00
           </div>
-          <div className="text-xs text-slate-400">Peak Active Hour of Day</div>
+          <div className="text-xs text-neutral-500 dark:text-neutral-400">Peak Active Hour of Day</div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-2">
-          <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 w-fit">
+        <div className="bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl p-5 space-y-2 shadow-xs">
+          <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/15 w-fit">
             <Music className="w-5 h-5" />
           </div>
-          <div className="text-2xl font-extrabold text-slate-900 dark:text-white">
-            ~{stats.estimatedMusicHours} Hours
+          <div className="text-2xl font-bold text-neutral-950 dark:text-white tabular-nums">
+            ~{stats.estimatedMusicHours.toLocaleString()} Hours
           </div>
-          <div className="text-xs text-slate-400">Estimated Music Streaming</div>
+          <div className="text-xs text-neutral-500 dark:text-neutral-400">Estimated Music Streaming</div>
         </div>
       </div>
 
       {/* Top Channels & Top Artists Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Top 5 Channels */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Tv className="w-5 h-5 text-red-500" />
+        <div className="bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl p-6 space-y-4 shadow-xs">
+          <h3 className="text-base font-bold text-neutral-950 dark:text-white flex items-center gap-2">
+            <Tv className="w-4 h-4 text-red-500" />
             <span>Top 5 Channels in {stats.year}</span>
           </h3>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {stats.topChannels.map((item, idx) => (
               <div
                 key={item.name}
-                className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800"
+                className="flex items-center justify-between p-3 rounded-xl bg-neutral-50 dark:bg-white/4 border border-black/4 dark:border-white/5"
               >
                 <div className="flex items-center gap-3">
-                  <span className="w-7 h-7 rounded-full bg-red-600/10 text-red-600 dark:text-red-400 font-bold text-xs flex items-center justify-center">
+                  <span className="w-6 h-6 rounded-full bg-red-600/10 text-red-600 dark:text-red-400 font-bold text-xs flex items-center justify-center">
                     #{idx + 1}
                   </span>
-                  <span className="font-semibold text-slate-900 dark:text-white text-sm">
+                  <span className="font-medium text-neutral-900 dark:text-white text-sm">
                     {item.name}
                   </span>
                 </div>
-                <span className="text-xs font-mono text-slate-500">
+                <span className="text-xs font-mono text-neutral-500 dark:text-neutral-400">
                   {item.count} watches
                 </span>
               </div>
@@ -156,27 +156,27 @@ export function RewindPage() {
         </div>
 
         {/* Top 5 Artists */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Mic className="w-5 h-5 text-blue-500" />
+        <div className="bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl p-6 space-y-4 shadow-xs">
+          <h3 className="text-base font-bold text-neutral-950 dark:text-white flex items-center gap-2">
+            <Mic className="w-4 h-4 text-blue-500" />
             <span>Top 5 Artists in {stats.year}</span>
           </h3>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {stats.topArtists.map((item, idx) => (
               <div
                 key={item.name}
-                className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800"
+                className="flex items-center justify-between p-3 rounded-xl bg-neutral-50 dark:bg-white/4 border border-black/4 dark:border-white/5"
               >
                 <div className="flex items-center gap-3">
-                  <span className="w-7 h-7 rounded-full bg-blue-600/10 text-blue-600 dark:text-blue-400 font-bold text-xs flex items-center justify-center">
+                  <span className="w-6 h-6 rounded-full bg-blue-600/10 text-blue-600 dark:text-blue-400 font-bold text-xs flex items-center justify-center">
                     #{idx + 1}
                   </span>
-                  <span className="font-semibold text-slate-900 dark:text-white text-sm">
+                  <span className="font-medium text-neutral-900 dark:text-white text-sm">
                     {item.name}
                   </span>
                 </div>
-                <span className="text-xs font-mono text-slate-500">
+                <span className="text-xs font-mono text-neutral-500 dark:text-neutral-400">
                   {item.count} plays
                 </span>
               </div>

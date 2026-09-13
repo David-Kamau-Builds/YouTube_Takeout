@@ -126,7 +126,7 @@ export function MusicPage() {
         item.title.toLowerCase().includes(q) ||
         item.channelName.toLowerCase().includes(q)
     );
-  }, [data?.musicHistory, historySearch]);
+  }, [data, historySearch]);
 
   if (isLoading) {
     return (
@@ -152,13 +152,27 @@ export function MusicPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          YouTube Music Hub
-        </h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Detailed metrics for your music streaming, saved songs, and top artists.
-        </p>
+      {/* Executive Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl shadow-xs">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-500 dark:text-blue-400 border border-blue-500/15 shrink-0">
+            <Music className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-semibold text-neutral-950 dark:text-white tracking-tight">
+              YouTube Music Hub
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+              Detailed metrics for your music streaming, saved tracks, and top artists.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="px-3 py-1.5 rounded-xl bg-neutral-50 dark:bg-white/5 border border-black/5 dark:border-white/5 text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+            <span className="tabular-nums font-semibold text-neutral-900 dark:text-white">{totalPlays.toLocaleString()}</span> total streams
+          </div>
+        </div>
       </div>
 
       {/* KPI Cards */}

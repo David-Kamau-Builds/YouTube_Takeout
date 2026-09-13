@@ -53,6 +53,25 @@ addEventListener('message', async (event: MessageEvent<WorkerInMessage>) => {
     const archiveLabel = fileNames.length === 1 ? fileNames[0] : `${fileNames.length} Takeout Archives`;
     const manifest = buildTakeoutManifest(normalizedMap, archiveLabel);
 
+    // Validate that archive actually contains recognized YouTube Takeout data
+    const hasValidYouTubeData =
+      manifest.files.watchHistory ||
+      manifest.files.subscriptions ||
+      manifest.files.playlists ||
+      manifest.files.musicLibrary ||
+      manifest.files.comments ||
+      manifest.files.liveChats ||
+      manifest.files.channels ||
+      manifest.playlistFileCount > 0;
+
+    if (!hasValidYouTubeData) {
+      postMessage({
+        type: 'ERROR',
+        message: `No YouTube Takeout data found in "${archiveLabel}". The selected file does not appear to be a Google Takeout export for YouTube. Please upload an archive containing your "YouTube and YouTube Music" folder.`,
+      } satisfies WorkerOutMessage);
+      return;
+    }
+
     const filesRecord: Record<string, string> = {};
     for (const [k, v] of normalizedMap.entries()) {
       filesRecord[k] = v;

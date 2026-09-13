@@ -69,18 +69,34 @@ export function DataTable<TData>({ data, columns, pageSize = 10 }: DataTableProp
             ))}
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-            {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-4 py-3 text-slate-800 dark:text-slate-200">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
+            {table.getRowModel().rows.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="px-4 py-12 text-center text-neutral-400 dark:text-neutral-500 text-xs"
+                >
+                  <div className="flex flex-col items-center justify-center gap-1">
+                    <span className="font-medium text-neutral-700 dark:text-neutral-300 text-sm">
+                      No matching records found
+                    </span>
+                    <span>Try adjusting your search terms or clearing active filters.</span>
+                  </div>
+                </td>
               </tr>
-            ))}
+            ) : (
+              table.getRowModel().rows.map((row) => (
+                <tr
+                  key={row.id}
+                  className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="px-4 py-3 text-slate-800 dark:text-slate-200">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

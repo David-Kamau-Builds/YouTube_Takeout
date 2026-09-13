@@ -16,45 +16,71 @@ interface TopBarChartProps {
   barColor?: string;
 }
 
-export function TopBarChart({ data, title, barColor = '#ef4444' }: TopBarChartProps) {
-  const { isDark } = useTheme();
+interface CustomBarTooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: RankingItem }>;
+}
+
+function CustomBarTooltip({ active, payload }: CustomBarTooltipProps) {
+  if (!active || !payload || !payload.length) return null;
+  const item = payload[0].payload;
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs transition-all duration-200">
-      <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight mb-6">
-        {title}
-      </h3>
+    <div className="px-3 py-1.5 rounded-xl bg-neutral-900/90 dark:bg-[#1f2128]/95 backdrop-blur-md text-white border border-white/10 shadow-xl text-xs space-y-0.5">
+      <div className="font-medium text-neutral-200">{item.name}</div>
+      <div className="text-[11px] text-neutral-400">
+        <span className="font-semibold tabular-nums text-white">{item.count.toLocaleString()}</span> plays / views
+      </div>
+    </div>
+  );
+}
+
+export function TopBarChart({ data, title, barColor }: TopBarChartProps) {
+  const { isDark } = useTheme();
+  const effectiveBarColor = barColor || (isDark ? '#e5e7eb' : '#171717');
+
+  return (
+    <div className="bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl p-5 sm:p-6 shadow-xs transition-all duration-200">
+      <div className="mb-4">
+        <h3 className="text-sm font-semibold text-neutral-900 dark:text-white tracking-tight">
+          {title}
+        </h3>
+        <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+          Top creators and performers by frequency
+        </p>
+      </div>
+
       <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <RechartsBarChart
             layout="vertical"
             data={data}
-            margin={{ top: 5, right: 20, left: 40, bottom: 5 }}
+            margin={{ top: 0, right: 15, left: 10, bottom: 0 }}
           >
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={isDark ? '#334155' : '#e2e8f0'} opacity={0.5} />
-            <XAxis type="number" stroke={isDark ? '#94a3b8' : '#64748b'} fontSize={12} tickLine={false} axisLine={false} />
-            <YAxis
-              dataKey="name"
-              type="category"
-              stroke={isDark ? '#94a3b8' : '#64748b'}
+            <CartesianGrid
+              strokeDasharray="2 4"
+              horizontal={false}
+              stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}
+            />
+            <XAxis
+              type="number"
+              stroke={isDark ? '#6b7280' : '#9ca3af'}
               fontSize={11}
               tickLine={false}
               axisLine={false}
-              width={110}
+            />
+            <YAxis
+              dataKey="name"
+              type="category"
+              stroke={isDark ? '#9ca3af' : '#4b5563'}
+              fontSize={11}
+              tickLine={false}
+              axisLine={false}
+              width={120}
               tickFormatter={(value) => (value.length > 18 ? `${value.substring(0, 16)}...` : value)}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-                borderColor: isDark ? '#334155' : '#e2e8f0',
-                borderRadius: '0.75rem',
-                color: isDark ? '#fff' : '#0f172a',
-                fontSize: '12px',
-                boxShadow: isDark ? '0 10px 15px -3px rgba(0,0,0,0.5)' : '0 10px 15px -3px rgba(0,0,0,0.1)',
-              }}
-              formatter={(val: any) => [`${val} plays/watches`, 'Count']}
-            />
-            <Bar dataKey="count" fill={barColor} radius={[0, 6, 6, 0]} barSize={18} />
+            <Tooltip content={<CustomBarTooltip />} cursor={false} />
+            <Bar dataKey="count" fill={effectiveBarColor} radius={[0, 4, 4, 0]} barSize={14} />
           </RechartsBarChart>
         </ResponsiveContainer>
       </div>

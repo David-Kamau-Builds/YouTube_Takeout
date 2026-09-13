@@ -51,6 +51,8 @@ export function normalizeTakeoutPaths(rawMap: Map<string, string>): Map<string, 
     // Map specific files to standard normalized paths
     if (lower.endsWith('watch-history.json') || lower === 'watch-history.json') {
       normalized.set('history/watch-history.json', content);
+    } else if (lower.endsWith('watch-history.html') || lower.endsWith('watch-history.htm')) {
+      normalized.set('history/watch-history.html', content);
     } else if (lower.endsWith('subscriptions.csv') || lower === 'subscriptions.csv') {
       normalized.set('subscriptions/subscriptions.csv', content);
     } else if (lower.endsWith('playlists/playlists.csv') || lower === 'playlists.csv') {
@@ -107,7 +109,9 @@ export function buildTakeoutManifest(
     uploadedAt: Date.now(),
     totalFilesFound: extractedKeys.length,
     files: {
-      watchHistory: normalizedMap.has('history/watch-history.json'),
+      watchHistory:
+        normalizedMap.has('history/watch-history.json') ||
+        normalizedMap.has('history/watch-history.html'),
       subscriptions: normalizedMap.has('subscriptions/subscriptions.csv'),
       playlists: normalizedMap.has('playlists/playlists.csv'),
       musicLibrary: normalizedMap.has('music/music library songs.csv'),

@@ -1,5 +1,5 @@
 import { AlertTriangle, RefreshCw, UploadCloud } from 'lucide-react';
-import { useTakeout } from '../../context/TakeoutContext';
+import { useTakeout } from '../../hooks/useTakeout';
 
 interface ErrorFallbackProps {
   message?: string;
@@ -10,11 +10,11 @@ export function ErrorFallback({
   message,
   onRetry,
 }: ErrorFallbackProps) {
-  const { activeSource, openUploadModal } = useTakeout();
+  const { activeSource, openUploadModal, clearUploadedData } = useTakeout();
 
   const defaultMessage =
     activeSource === 'uploaded'
-      ? 'Failed to read from your uploaded Takeout. Your archive may be missing this data section.'
+      ? 'Failed to read data from this section. Your uploaded archive may not contain this YouTube export category.'
       : 'No Takeout archive loaded. Please upload your export to view this section.';
 
   const displayMessage = message || defaultMessage;
@@ -29,7 +29,7 @@ export function ErrorFallback({
       </h3>
       <p className="text-xs text-red-700 dark:text-red-300 mb-4">{displayMessage}</p>
       
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-2">
         {onRetry && (
           <button
             onClick={onRetry}
@@ -46,8 +46,17 @@ export function ErrorFallback({
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-red-500/30 hover:bg-red-500/10 text-red-700 dark:text-red-300 text-xs font-medium transition-colors cursor-pointer"
         >
           <UploadCloud className="w-3.5 h-3.5" />
-          <span>Upload Your Takeout</span>
+          <span>Upload Valid Takeout</span>
         </button>
+        {activeSource === 'uploaded' && (
+          <button
+            onClick={() => clearUploadedData()}
+            type="button"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400 text-xs font-medium transition-colors cursor-pointer"
+          >
+            <span>Reset Database</span>
+          </button>
+        )}
       </div>
     </div>
   );

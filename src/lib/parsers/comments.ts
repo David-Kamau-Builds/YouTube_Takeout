@@ -63,7 +63,9 @@ function parseTextSegments(rawText?: string): { segments: CommentTextSegment[]; 
 }
 
 export async function loadComments(): Promise<Comment[]> {
-  const text = await fileLoader.readText('comments/comments.csv');
+  const text = await fileLoader.readTextOptional('comments/comments.csv');
+  if (!text) return [];
+
   const raw = await parseCsvText<RawComment>(text);
   
   return raw

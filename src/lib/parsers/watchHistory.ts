@@ -1,9 +1,19 @@
 import { fileLoader } from '../takeout/fileLoader';
 import type { WatchHistoryRecord, NormalizedWatchRecord } from '../../types';
 import { cleanTitle, cleanArtistName, extractVideoId, getActionType } from '../format/strings';
+import { parseWatchHistoryHtml } from './watchHistoryHtml';
 
 export async function loadWatchHistory(): Promise<NormalizedWatchRecord[]> {
-  const rawRecords = await fileLoader.readJson<WatchHistoryRecord[]>('history/watch-history.json');
+  let rawRecords = await fileLoader.readJsonOptional<WatchHistoryRecord[]>('history/watch-history.json');
+
+  if (!rawRecords || !Array.isArray(rawRecords) || rawRecords.length === 0) {
+    const htmlText = await fileLoader.readTextOptional('history/watch-history.html');
+    if (htmlText) {
+      rawRecords = parseWatchHistoryHtml(htmlText);
+    }
+  }
+
+  if (!rawRecords || !Array.isArray(rawRecords)) return [];
 
   return rawRecords.map((record, index) => {
     const isMusic = record.header === 'YouTube Music';

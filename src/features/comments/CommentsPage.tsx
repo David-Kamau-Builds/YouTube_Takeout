@@ -9,11 +9,13 @@ import { Badge } from '../../components/ui/Badge';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ErrorFallback } from '../../components/ui/ErrorFallback';
 import { formatDateTime } from '../../lib/format/dates';
-import { MessageSquare, CornerDownRight } from 'lucide-react';
+import { MessageSquare, CornerDownRight, Info } from 'lucide-react';
 import { FormattedMessageText } from '../../components/ui/FormattedMessageText';
 import { VideoPreviewCell } from '../../components/ui/VideoPreviewCell';
+import { useTakeout } from '../../hooks/useTakeout';
 
 export function CommentsPage() {
+  const { manifest } = useTakeout();
   const { data: comments = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['comments'],
     queryFn: () => loadComments(),
@@ -103,18 +105,38 @@ export function CommentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <MessageSquare className="w-6 h-6 text-red-600" />
-            <span>Comments ({comments.length})</span>
-          </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Comments you posted across YouTube videos and community posts.
-          </p>
+      {/* Executive Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl shadow-xs">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="p-2.5 rounded-xl bg-orange-500/10 text-orange-500 dark:text-orange-400 border border-orange-500/15 shrink-0">
+            <MessageSquare className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-semibold text-neutral-950 dark:text-white tracking-tight">
+              User Comments
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+              Public comments and responses posted from your YouTube profile.
+            </p>
+          </div>
         </div>
 
-        <div className="w-full md:w-72">
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="px-3 py-1.5 rounded-xl bg-neutral-50 dark:bg-white/5 border border-black/5 dark:border-white/5 text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+            <span className="tabular-nums font-semibold text-neutral-900 dark:text-white">{comments.length.toLocaleString()}</span> comments
+          </div>
+        </div>
+      </div>
+
+      {manifest && !manifest.files.comments && (
+        <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:text-amber-300 text-xs flex items-center gap-2.5">
+          <Info className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
+          <span>Comments data is not included in this Takeout export ({manifest.archiveName}).</span>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between gap-4">
+        <div className="w-full max-w-sm">
           <SearchInput
             value={search}
             onChange={setSearch}

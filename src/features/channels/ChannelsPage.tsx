@@ -30,37 +30,84 @@ export function ChannelsPage() {
     );
   }
 
-  if (isError || !data || !data.profile) {
-    return <ErrorFallback onRetry={() => refetch()} message="Channel profile metadata could not be found." />;
+  if (isError) {
+    return <ErrorFallback onRetry={() => refetch()} />;
+  }
+
+  if (!data?.profile) {
+    return (
+      <div className="space-y-6 max-w-4xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl shadow-xs">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-500 dark:text-purple-400 border border-purple-500/15 shrink-0">
+              <Tv className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-semibold text-neutral-950 dark:text-white tracking-tight">
+                Channel Profile
+              </h2>
+              <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+                Exported settings, account identity, and creator configuration.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-8 rounded-2xl bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 text-center space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-neutral-100 dark:bg-white/5 flex items-center justify-center mx-auto text-neutral-400">
+            <Tv className="w-6 h-6 stroke-[1.5]" />
+          </div>
+          <h3 className="text-base font-semibold text-neutral-900 dark:text-white">
+            Channel Profile Not Included
+          </h3>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-md mx-auto">
+            Channel settings and profile data were not detected in this Takeout export. When requesting your Google Takeout archive, ensure YouTube channel settings are checked.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   const { profile, commentsCount, liveChatsCount } = data;
 
   return (
-    <div className="space-y-8 max-w-4xl">
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-          <Tv className="w-6 h-6 text-red-600" />
-          <span>Channel Profile</span>
-        </h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Exported settings and account metadata for your YouTube channel.
-        </p>
+    <div className="space-y-6 max-w-4xl">
+      {/* Executive Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl shadow-xs">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-500 dark:text-purple-400 border border-purple-500/15 shrink-0">
+            <Tv className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-semibold text-neutral-950 dark:text-white tracking-tight">
+              Channel Profile
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+              Exported settings, account identity, and creator configuration.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="px-3 py-1.5 rounded-xl bg-neutral-50 dark:bg-white/5 border border-black/5 dark:border-white/5 text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+            <span className="font-semibold text-neutral-900 dark:text-white">Active Channel</span>
+          </div>
+        </div>
       </div>
 
       {/* Main Profile Card */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 lg:p-8 shadow-xs space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
+      <div className="bg-white dark:bg-[#15171c] border border-black/6 dark:border-white/8 rounded-2xl p-6 lg:p-8 shadow-xs space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-black/6 dark:border-white/8">
           <div className="flex items-center gap-4">
-            <div className="p-4 rounded-2xl bg-red-600/10 text-red-600 dark:text-red-400 border border-red-500/20">
-              <User className="w-8 h-8" />
+            <div className="p-3.5 rounded-2xl bg-neutral-100 dark:bg-white/5 text-neutral-700 dark:text-neutral-300 border border-black/5 dark:border-white/5">
+              <User className="w-7 h-7" />
             </div>
             <div>
-              <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              <h3 className="text-xl font-bold text-neutral-950 dark:text-white tracking-tight">
                 {profile.channelTitle}
               </h3>
               {profile.vanityUrl && (
-                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
                   @{profile.vanityUrl}
                 </span>
               )}

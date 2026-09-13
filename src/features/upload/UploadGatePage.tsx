@@ -1,18 +1,17 @@
 import { useState, useRef, type DragEvent, type ChangeEvent } from 'react';
-import { useTakeout } from '../../context/TakeoutContext';
+import { useTakeout } from '../../hooks/useTakeout';
 import { MAX_UPLOAD_BYTES } from '../../types/takeout';
 import { ThemeToggle } from '../../components/layout/ThemeToggle';
 import {
-  PlayCircle,
-  UploadCloud,
   FolderUp,
   Loader2,
   AlertCircle,
-  BarChart3,
-  Flame,
-  Music2,
   Lock,
+  FileArchive,
+  HardDrive,
 } from 'lucide-react';
+import { YouTubeLogo } from '../../components/ui/YouTubeLogo';
+import { TakeoutGuide } from '../../components/takeout/TakeoutGuide';
 
 export function UploadGatePage() {
   const {
@@ -38,7 +37,7 @@ export function UploadGatePage() {
       const sizeMb = (totalBytes / (1024 * 1024)).toFixed(1);
       const maxMb = (MAX_UPLOAD_BYTES / (1024 * 1024)).toFixed(0);
       setLocalSizeError(
-        `Your archive is ${sizeMb} MB. We currently support up to ${maxMb} MB in browser memory. Try uploading an uncompressed folder instead, or use the local CLI script (npm run extract-takeout).`
+        `Archive size is ${sizeMb} MB. Browser memory allows up to ${maxMb} MB for compressed archives. For larger histories, select the uncompressed Takeout folder, or use the local CLI script (npm run extract-takeout).`
       );
       return;
     }
@@ -81,68 +80,63 @@ export function UploadGatePage() {
   const displayError = localSizeError || uploadError;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-between p-4 sm:p-8">
+    <div className="min-h-screen bg-[#fbfbfd] dark:bg-[#0d0e11] text-neutral-900 dark:text-neutral-100 flex flex-col justify-between p-4 sm:p-8 selection:bg-red-500/10">
       {/* Top Bar */}
-      <header className="max-w-6xl w-full mx-auto flex items-center justify-between py-2">
+      <header className="max-w-5xl w-full mx-auto flex items-center justify-between py-2">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-2xl bg-red-600 text-white shadow-lg shadow-red-600/30">
-            <PlayCircle className="w-6 h-6" />
+          <YouTubeLogo className="w-7 h-7" />
+          <div className="flex flex-col">
+            <span className="font-semibold text-sm tracking-tight text-neutral-900 dark:text-neutral-100">
+              YouTube Takeout
+            </span>
           </div>
-          <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-red-600 via-rose-500 to-amber-500 bg-clip-text text-transparent">
-            Takeout Visualizer
-          </span>
         </div>
         <ThemeToggle />
       </header>
 
-      {/* Main Hero & Upload Card */}
-      <main className="max-w-4xl w-full mx-auto my-8 space-y-8">
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold uppercase tracking-wider">
-            <Flame className="w-3.5 h-3.5" />
-            <span>Discover Your YouTube Footprint</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            Visualize Your Entire YouTube History
+      {/* Main Container */}
+      <main className="max-w-3xl w-full mx-auto my-6 space-y-6">
+        {/* Header Title Section */}
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-neutral-950 dark:text-white">
+            Import YouTube Archive
           </h1>
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Upload your Google Takeout archive to explore deep interactive statistics, watch habits, music replay, and playlist insights — completely client-side in your browser.
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-xl mx-auto leading-relaxed">
+            Extract, index, and analyze your watch history, playlist habits, and YouTube Music library entirely inside your browser.
           </p>
         </div>
 
         {/* Upload Container */}
-        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-6">
+        <div className="bg-white dark:bg-[#15171c] border border-black/8 dark:border-white/8 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
           {displayError && (
-            <div className="flex items-start gap-3 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-300 text-xs">
-              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" />
-              <div className="space-y-1">
-                <div className="font-semibold text-rose-900 dark:text-rose-200">Upload Rejected</div>
-                <div>{displayError}</div>
+            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-rose-500/8 border border-rose-500/20 text-rose-700 dark:text-rose-400 text-xs">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <div className="space-y-0.5">
+                <div className="font-semibold">Import Issue</div>
+                <div className="leading-relaxed">{displayError}</div>
               </div>
             </div>
           )}
 
           {isExtracting ? (
-            <div className="py-12 px-6 rounded-3xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-center space-y-5">
-              <div className="inline-flex p-4 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400">
-                <Loader2 className="w-10 h-10 animate-spin" />
-              </div>
+            <div className="py-12 px-6 rounded-xl bg-neutral-50 dark:bg-white/5 border border-black/5 dark:border-white/5 text-center space-y-4">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto text-neutral-800 dark:text-neutral-200" />
               <div className="space-y-1">
-                <div className="text-base font-bold text-slate-800 dark:text-slate-200">
-                  {statusMessage || 'Unpacking archive...'}
+                <div className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
+                  {statusMessage || 'Processing archive streams...'}
                 </div>
-                <div className="text-xs text-slate-500">
-                  Decompressing archives and populating local database...
+                <div className="text-xs text-neutral-500">
+                  Decompressing archives and indexing into client IndexedDB...
                 </div>
               </div>
 
-              <div className="max-w-md mx-auto w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+              <div className="max-w-xs mx-auto w-full bg-neutral-200 dark:bg-white/10 rounded-full h-1.5 overflow-hidden">
                 <div
-                  className="bg-red-600 h-3 rounded-full transition-all duration-300 ease-out"
+                  className="bg-neutral-900 dark:bg-white h-1.5 rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <div className="text-xs font-mono text-slate-500">{progress}%</div>
+              <div className="text-xs tabular-nums font-mono text-neutral-500">{progress}%</div>
             </div>
           ) : (
             <div
@@ -150,11 +144,10 @@ export function UploadGatePage() {
               onDragLeave={onDragLeave}
               onDrop={onDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center transition-all duration-200 cursor-pointer ${
-                isDragOver
-                  ? 'border-red-500 bg-red-500/5 scale-[0.99]'
-                  : 'border-slate-300 dark:border-slate-700 hover:border-red-500/60 hover:bg-slate-50/60 dark:hover:bg-slate-800/30'
-              }`}
+              className={`border border-dashed rounded-xl p-8 sm:p-10 text-center transition-all duration-150 cursor-pointer ${isDragOver
+                ? 'border-neutral-900 dark:border-white bg-neutral-100/60 dark:bg-white/5 scale-[1.005]'
+                : 'border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500 bg-neutral-50/50 dark:bg-white/2'
+                }`}
             >
               <input
                 ref={fileInputRef}
@@ -175,27 +168,27 @@ export function UploadGatePage() {
                 className="hidden"
               />
 
-              <div className="p-4 sm:p-5 rounded-3xl bg-red-500/10 text-red-600 dark:text-red-400 w-fit mx-auto mb-4">
-                <UploadCloud className="w-10 h-10" />
+              <div className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-white/10 text-neutral-700 dark:text-neutral-300 flex items-center justify-center mx-auto mb-3">
+                <FileArchive className="w-5 h-5" />
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                Drag & Drop your Takeout file or folder
+              <h2 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white mb-1">
+                Drop your Google Takeout archive here
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6">
-                Drop your Google Takeout archive (.zip, .tgz, .tar.gz) or select an uncompressed Takeout folder for instant zero-overhead loading.
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto mb-5">
+                Select your Takeout <code className="text-neutral-700 dark:text-neutral-300 font-mono">.zip</code> archive, or choose an uncompressed folder for instant loading.
               </p>
 
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-2.5">
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     fileInputRef.current?.click();
                   }}
-                  className="px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold shadow-lg shadow-red-600/30 transition-all transform active:scale-95 cursor-pointer"
+                  className="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 text-xs font-medium transition-all cursor-pointer shadow-xs active:scale-[0.98]"
                 >
-                  Choose Archive File(s)
+                  Select Archive File
                 </button>
                 <button
                   type="button"
@@ -203,74 +196,52 @@ export function UploadGatePage() {
                     e.stopPropagation();
                     folderInputRef.current?.click();
                   }}
-                  className="px-6 py-3 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-semibold transition-all inline-flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2 rounded-lg border border-black/10 dark:border-white/15 hover:bg-neutral-100 dark:hover:bg-white/5 text-neutral-700 dark:text-neutral-300 text-xs font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer active:scale-[0.98]"
                 >
-                  <FolderUp className="w-4 h-4" />
+                  <FolderUp className="w-3.5 h-3.5 text-neutral-500" />
                   <span>Choose Folder</span>
                 </button>
               </div>
 
-              <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-400">
-                <span className="font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">.zip</span>
-                <span className="font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">.tgz</span>
-                <span className="font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">.tar.gz</span>
-                <span className="font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">Takeout Folder</span>
-                <span>• Temporary 10 MB in-memory cap</span>
+              <div className="mt-5 pt-4 border-t border-black/5 dark:border-white/5 flex flex-wrap items-center justify-center gap-2 text-[11px] text-neutral-400 dark:text-neutral-500">
+                <span className="font-mono bg-neutral-200/50 dark:bg-white/5 px-1.5 py-0.5 rounded text-neutral-600 dark:text-neutral-400">.zip</span>
+                <span className="font-mono bg-neutral-200/50 dark:bg-white/5 px-1.5 py-0.5 rounded text-neutral-600 dark:text-neutral-400">.tgz</span>
+                <span className="font-mono bg-neutral-200/50 dark:bg-white/5 px-1.5 py-0.5 rounded text-neutral-600 dark:text-neutral-400">.tar.gz</span>
+                <span>&bull; Up to 10 MB in-memory compressed archive</span>
               </div>
             </div>
           )}
 
-          {/* How to Get Takeout Card */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="space-y-1 text-left">
-              <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white">
-                How to download your YouTube data:
-              </h3>
-              <p className="text-[11px] sm:text-xs text-slate-500">
-                1. Visit Google Takeout &bull; 2. Select only &ldquo;YouTube and YouTube Music&rdquo; &bull; 3. Create export &amp; download the archive.
-              </p>
-            </div>
-            <a
-              href="https://takeout.google.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all shrink-0 inline-flex items-center gap-1.5"
-            >
-              <span>Open Google Takeout</span>
-              <span aria-hidden="true">&rarr;</span>
-            </a>
-          </div>
+          {/* Step-by-Step Export Guide & Expected Archive Structure */}
+          <TakeoutGuide />
 
-          {/* Privacy Guarantee Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/60 dark:border-slate-800/60">
-              <Lock className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+          {/* Privacy & Architecture Guarantees */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="flex items-start gap-2.5 p-3 rounded-xl bg-neutral-50/50 dark:bg-white/2 border border-black/4 dark:border-white/5 text-xs">
+              <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
               <div>
-                <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">100% Client-Side</div>
-                <div className="text-[11px] text-slate-500">No servers, no tracking, zero data transmission.</div>
+                <div className="font-medium text-neutral-900 dark:text-neutral-100">Zero Cloud Uploads</div>
+                <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+                  Archives are parsed locally. Nothing ever leaves your browser.
+                </div>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/60 dark:border-slate-800/60">
-              <BarChart3 className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2.5 p-3 rounded-xl bg-neutral-50/50 dark:bg-white/2 border border-black/4 dark:border-white/5 text-xs">
+              <HardDrive className="w-4 h-4 text-neutral-600 dark:text-neutral-400 shrink-0 mt-0.5" />
               <div>
-                <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">Deep Analytics</div>
-                <div className="text-[11px] text-slate-500">Hours watched, top channels, playlists & rewind.</div>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/60 dark:border-slate-800/60">
-              <Music2 className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-              <div>
-                <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">YouTube Music</div>
-                <div className="text-[11px] text-slate-500">Track listening trends and saved music library.</div>
+                <div className="font-medium text-neutral-900 dark:text-neutral-100">IndexedDB Indexed</div>
+                <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+                  High-speed local queries and caching so subsequent visits load instantly.
+                </div>
               </div>
             </div>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="text-center text-xs text-slate-400 dark:text-slate-500 py-4">
-        YouTube Takeout Visualizer • Private & Open Source Local Tool
+      {/* Subtle Footer */}
+      <footer className="text-center text-[11px] text-neutral-400 dark:text-neutral-600 py-3">
+        YouTube Takeout
       </footer>
     </div>
   );

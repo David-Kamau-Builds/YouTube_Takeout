@@ -12,7 +12,9 @@ interface RawMusicLibrarySong {
 }
 
 export async function loadMusicLibrary(): Promise<MusicLibrarySong[]> {
-  const text = await fileLoader.readText('music/music library songs.csv');
+  const text = await fileLoader.readTextOptional('music/music library songs.csv');
+  if (!text) return [];
+
   const raw = await parseCsvText<RawMusicLibrarySong>(text);
 
   return raw

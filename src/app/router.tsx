@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from './layout';
 import { DashboardPage } from '../features/dashboard/DashboardPage';
 import { HistoryPage } from '../features/history/HistoryPage';
@@ -24,6 +24,7 @@ export const router = createBrowserRouter([
       { path: 'comments', element: <CommentsPage /> },
       { path: 'live-chats', element: <LiveChatsPage /> },
       { path: 'rewind', element: <RewindPage /> },
+      { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
 ]);
